@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Chemistry Notes</title>
+  <link rel="stylesheet" href="../style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="site-header">
+    <h1>🧪 Chemistry Notes</h1>
+    <p class="tagline">All uploaded chemistry notes appear automatically below</p>
+    <button id="themeToggle" class="theme-toggle">🌙</button>
+  </header>
+
+  <main class="container">
+    <input type="text" id="searchNotes" placeholder="Search chemistry notes..." style="width:100%;max-width:400px;padding:.8rem 1rem;border:2px solid #ccc;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.05);margin-bottom:1rem;">
+    <ul id="notesList"></ul>
+    <a href="../index.html" style="display:inline-block;margin-top:1rem;">← Back to Subjects</a>
+  </main>
+
+  <script src="../scripts.js"></script>
+  <script>
+    // --- Auto list notes using GitHub API ---
+    const notesList = document.getElementById('notesList');
+    const searchNotes = document.getElementById('searchNotes');
+
+    // Replace with your own GitHub username & repo name
+    const username = 'YOUR_GITHUB_USERNAME';
+    const repo = 'YOUR_REPO_NAME';
+    const folderPath = 'subjects/files/chemistry';
+
+    async function fetchNotes() {
+      const apiURL = `https://api.github.com/repos/${username}/${repo}/contents/${folderPath}`;
+      try {
+        const res = await fetch(apiURL);
+        const files = await res.json();
+        files.forEach(file => {
+          if (file.type === 'file') {
+            const li = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = file.download_url;
+            link.textContent = file.name;
+            link.target = '_blank';
+            link.download = '';
+            li.appendChild(link);
+            notesList.appendChild(li);
+          }
+        });
+      } catch (e) {
+        notesList.innerHTML = '<li>⚠️ Unable to load files — please check folder path.</li>';
+      }
+    }
+    fetchNotes();
+
+    // Simple search within notes
+    searchNotes.addEventListener('input', () => {
+      const q = searchNotes.value.toLowerCase();
+      document.querySelectorAll('#notesList li').forEach(li => {
+        li.style.display = li.textContent.toLowerCase().includes(q) ? 'list-item' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>
